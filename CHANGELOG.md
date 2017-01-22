@@ -1,3 +1,7 @@
+# 0.1.6-- better error hanlding
+
+1. Better handling of Errors like 405 etc..
+
 # 0.1.3 -- config fix
 
 1. Config fix

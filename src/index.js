@@ -9,12 +9,44 @@
 // workaround to use httpprovider in different envs
 const XHR2 = require('xhr2');
 
+/*
+""
+responseText
+:
+""
+responseType
+:
+""
+responseURL
+:
+"https://ropsten.infura.io/"
+responseXML
+:
+null
+status
+:
+405
+statusText
+:
+"Method Not Allowed"
+timeout
+:
+0
+*/
+
 /**
  * InvalidResponseError helper for invalid errors.
  */
-function invalidResponseError(result, host) {
-  const message = !!result && !!result.error && !!result.error.message ? `[ethjs-provider-http] ${result.error.message}` : `[ethjs-provider-http] Invalid JSON RPC response from host provider ${host}: ${JSON.stringify(result, null, 2)}`;
-  return new Error(message);
+function invalidResponseError(request, host) {
+  const responseError = new Error(`[ethjs-provider-http] Invalid JSON RPC response from provider
+    host: ${host}
+    response: ${String(request.responseText)} ${JSON.stringify(request.responseText, null, 2)}
+    responseURL: ${request.responseURL}
+    status: ${request.status}
+    statusText: ${request.statusText}
+  `);
+  responseError.value = request;
+  return responseError;
 }
 
 /**
@@ -52,7 +84,7 @@ HttpProvider.prototype.sendAsync = function (payload, callback) { // eslint-disa
       try {
         result = JSON.parse(result);
       } catch (jsonError) {
-        error = invalidResponseError(request.responseText, self.host);
+        error = invalidResponseError(request, self.host);
       }
 
       callback(error, result);
